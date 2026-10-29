@@ -18,9 +18,12 @@ model User {
 }
 
 model Session {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  expired_At DateTime
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user       User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
