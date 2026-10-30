@@ -1,4 +1,4 @@
-import z from "zod"
+import { z } from "zod"
 
 export const userSchema = z.object({
     username: z.string().min(4, "Username must contain at least 4 characters").max(20, "Username must not exceed 20 characters"),
@@ -7,3 +7,6 @@ export const userSchema = z.object({
 })
 
 export const updateUserSchema = userSchema.partial()
+
+export type UpdateUserInput = z.infer<typeof updateUserSchema>
+export type CreateUserInput = z.infer<typeof userSchema>
