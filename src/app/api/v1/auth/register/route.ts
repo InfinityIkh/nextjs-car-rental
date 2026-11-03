@@ -32,7 +32,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "Unable to create account with this email.",
+          errors : {
+            email : [
+              "Unable to create account with this email."
+            ]
+          }
+          ,
         },
         { status: 422 },
       );
