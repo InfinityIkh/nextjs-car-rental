@@ -1,16 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server"
+import { authProxy } from "./lib/proxy/auth.proxy"
+import { guestProxy } from "./lib/proxy/guest.proxy"
+import { apiProxy } from "./lib/proxy/api.proxy"
 
-export function proxy(request : NextRequest){
-    const token = request.cookies.get("session")
+const authUrls = ["/login", "/register"]
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-    if(!token){
-        return NextResponse.redirect(
-            new URL("/login" ,request.url)
-        )
-    }
-    return NextResponse.next()
+  if (pathname.startsWith("/api")) {
+    return apiProxy(request)
+  }
+  if (authUrls.includes(pathname)) {
+    return authProxy(request)
+  }
+
+  return guestProxy(request)
 }
 
 export const config = {
-    matcher : ["/users/:path*"]
+  matcher: ["/api/:path*", "/login", "/register", "/", "/users/:path*"],
 }
