@@ -28,7 +28,12 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         {
-          message: "Invalid email or password.",
+          succes : false ,
+          errors : {
+            email : [
+              "Invalid email or password."
+            ]
+          },
         },
         { status: 401 },
       )
@@ -38,7 +43,12 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid) {
       return NextResponse.json(
         {
-          message: "Invalid email or password.",
+          succes : false ,
+          errors : {
+            email : [
+              "Invalid email or password."
+            ]
+          },
         },
         { status: 401 },
       )
