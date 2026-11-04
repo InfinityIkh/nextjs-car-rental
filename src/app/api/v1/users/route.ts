@@ -1,14 +1,14 @@
+import { UserService } from "@/services/user.service"
 import { userSchema } from "@/validation/user.validation"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    const users = await GetUsers()
-    return NextResponse.json({
-      success: true,
-      message: "Users fetched successfully",
-      users,
-    })
+    const response = await UserService.getAll()
+    return NextResponse.json(
+        response.data,
+      { status: response.status }
+    )
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -29,34 +29,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+          message: "validation error",
           errors: result.error.flatten().fieldErrors,
         },
         { status: 422 }
       )
     }
 
-    const data = result.data
-    const existingUser = await GetUserByEmail(data.email)
-    if (existingUser) {
-      return NextResponse.json(
-        {
-          success: false,
-          errors: {
-            email: ["User email already exists"],
-          },
-        },
-        { status: 409 }
-      )
-    }
-
-    const createdUser = await Createuser(data)
+    const response = await UserService.createUser(result.data)
+    
     return NextResponse.json(
-      {
-        success: true,
-        message: "User created successfully",
-        user: createdUser,
-      },
-      { status: 201 }
+      response.data,
+      { status: response.status }
     )
   } catch (error: unknown) {
     return NextResponse.json(
