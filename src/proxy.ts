@@ -4,9 +4,13 @@ import { guestProxy } from "./lib/proxy/guest.proxy"
 import { apiProxy } from "./lib/proxy/api.proxy"
 
 const authUrls = ["/login", "/register"]
+const authEndepoints = ["/api/v1/auth/login", "/api/v1/auth/register"]
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-
+  
+  if(authEndepoints.includes(pathname)){
+    return
+  }
   if (pathname.startsWith("/api")) {
     return apiProxy(request)
   }
