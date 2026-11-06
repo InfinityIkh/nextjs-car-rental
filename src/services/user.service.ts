@@ -3,6 +3,7 @@ import { UserRepositorie } from "@/repositories/user.repositorie"
 import { ServiceResponse } from "@/types/response.type"
 import { UserType } from "@/types/user.type"
 import type { CreateUserInput, UpdateUserInput } from "@/validation/user.validation"
+import bcrypt from "bcryptjs"
 
 export class UserService {
     static async getAll(): ServiceResponse<{ users: UserType[] }> {
@@ -28,7 +29,9 @@ export class UserService {
     }
 
     static async createUser(data: CreateUserInput): ServiceResponse<{ user: UserType }> {
-        const existingUser = await UserRepositorie.getUserByEmail(data.email)
+        const { username, email, password }: CreateUserInput = data;
+        const normalizedEmail = email.trim().toLowerCase();
+        const existingUser = await UserRepositorie.getUserByEmail(normalizedEmail)
         if (existingUser) {
             return {
                 data: {
@@ -41,8 +44,14 @@ export class UserService {
                 status: 422
             }
         }
+
+        const passwordHash = await bcrypt.hash(password, 12)
         const createdUser = await prisma.user.create({
-            data: data,
+            data: {
+                username,
+                email: normalizedEmail,
+                password: passwordHash,
+            },
             select: {
                 id: true,
                 username: true,
@@ -153,7 +162,7 @@ export class UserService {
         }
     }
 
-    static async deleteUser(id: string): ServiceResponse<{ user : null}> {
+    static async deleteUser(id: string): ServiceResponse<{ user: null }> {
         const user = await UserService.getUser(id)
         if (!user.data.success) {
             return {
@@ -176,7 +185,7 @@ export class UserService {
             data: {
                 success: true,
                 message: "user deleted succesfully",
-                user : null
+                user: null
             },
             status: 200
         }
